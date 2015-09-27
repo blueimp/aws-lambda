@@ -1,5 +1,5 @@
 /*
- * Docker Hub Slack Notification
+ * Docker Hub Slack Notify function for AWS Lambda
  * https://github.com/blueimp/aws-lambda
  *
  * Copyright 2015, Sebastian Tschan
@@ -10,7 +10,7 @@
  */
 
 // Replace the following with your own Slack Webhook path:
-var slackWebhookPath = '/services/ABC/DEF/token';
+var slackWebhookPath = '/services/your/slack/hook';
 
 var template = '{push_data.pusher} pushed to ' +
         '<{repository.repo_url}|{repository.repo_name}>.';
