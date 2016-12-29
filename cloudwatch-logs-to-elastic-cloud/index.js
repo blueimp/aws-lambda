@@ -3,10 +3,16 @@
  * https://github.com/blueimp/aws-lambda
  *
  * Required environment variables:
- * - hostname:  Hostname of the Elasticsearch cluster HTTPS endpoint.
- * - port:      Port number of the Elasticsearch cluster HTTPS endpoint.
- * - username:  Name of an ES user with create_index and write permissions.
- * - encpass:   AWS KMS encrypted password for the ES user.
+ * - hostname:    Hostname of the Elasticsearch cluster HTTPS endpoint.
+ * - port:        Port number of the Elasticsearch cluster HTTPS endpoint.
+ * - username:    Name of an ES user with create_index and write permissions.
+ * - encpass:     AWS KMS encrypted password for the ES user.
+ *
+ * Optional environment variables:
+ * - pipeline:    The Elasticsearch ingest pipeline to use.
+ * - piperegexp:  RegExp matched with the log group if the pipeline applies.
+ * - pipefields:  Required fields for the pipeline to add if missing, e.g.:
+ *                http_user_agent= real_ip=127.0.0.1
  *
  * Copyright 2016, Sebastian Tschan
  * https://blueimp.net
@@ -21,13 +27,19 @@ const ENV = process.env
 ;['hostname', 'port', 'username', 'encpass'].forEach(key => {
   if (!ENV[key]) throw new Error(`Missing environment variable: ${key}`)
 })
+
+const PIPELINE_REGEXP = new RegExp(ENV.piperegexp || '.')
+const PIPELINE_FIELDS = ENV.pipefields
+  ? ENV.pipefields.split(' ').map(f => f.split('='))
+  : []
+
 let password
 
 const AWS = require('aws-sdk')
 const zlib = require('zlib')
 const https = require('https')
 
-function extractJson (message) {
+function extractJSON (message) {
   const jsonStart = message.indexOf('{')
   if (jsonStart < 0) return null
   try {
@@ -48,7 +60,7 @@ function buildExtractedSource (extractedFields) {
       source[key] = 1 * value
       return
     }
-    let obj = extractJson(value)
+    let obj = extractJSON(value)
     if (obj) {
       source['$' + key] = obj
     }
@@ -57,31 +69,50 @@ function buildExtractedSource (extractedFields) {
   return source
 }
 
-function buildSource (message, extractedFields) {
-  if (extractedFields) return buildExtractedSource(extractedFields)
-  return extractJson(message) || {}
+function addMissingPipelineFields (source) {
+  PIPELINE_FIELDS.forEach(field => {
+    let key = field[0]
+    if (source[key]) return
+    let value = field[1]
+    if (isNumeric(value)) {
+      source[key] = 1 * value
+      return
+    }
+    source[key] = value
+  })
 }
 
-function transform (payload) {
-  let bulkRequestBody = ''
-  payload.logEvents.forEach(logEvent => {
-    const action = {
-      index: {
-        _index: payload.logGroup.replace(/\W|_/g, '-').toLowerCase(),
-        _type: payload.logGroup,
-        _id: logEvent.id
-      }
+function buildAction (logEvent, payload, index) {
+  return {
+    index: {
+      _index: index,
+      _type: payload.logGroup,
+      _id: logEvent.id
     }
-    const source = buildSource(logEvent.message, logEvent.extractedFields)
-    source['@id'] = logEvent.id
-    source['@timestamp'] = new Date(1 * logEvent.timestamp).toISOString()
-    source['@message'] = logEvent.message
-    source['@owner'] = payload.owner
-    source['@log_group'] = payload.logGroup
-    source['@log_stream'] = payload.logStream
+  }
+}
+
+function buildSource (logEvent, payload, hasPipeline) {
+  const source = logEvent.extractedFields
+    ? buildExtractedSource(logEvent.extractedFields)
+    : extractJSON(logEvent.message) || {}
+  if (hasPipeline) addMissingPipelineFields(source)
+  source['@id'] = logEvent.id
+  source['@timestamp'] = new Date(1 * logEvent.timestamp).toISOString()
+  source['@message'] = logEvent.message
+  source['@owner'] = payload.owner
+  source['@log_group'] = payload.logGroup
+  source['@log_stream'] = payload.logStream
+  return source
+}
+
+function transform (payload, hasPipeline) {
+  let bulkRequestBody = ''
+  const index = payload.logGroup.replace(/\W|_/g, '-').toLowerCase()
+  payload.logEvents.forEach(logEvent => {
     bulkRequestBody += [
-      JSON.stringify(action),
-      JSON.stringify(source)
+      JSON.stringify(buildAction(logEvent, payload, index)),
+      JSON.stringify(buildSource(logEvent, payload, hasPipeline))
     ].join('\n') + '\n'
   })
   return bulkRequestBody
@@ -112,11 +143,16 @@ function handleResponse (response, callback) {
     })
 }
 
-function post (body, callback) {
+function queryString (hasPipeline) {
+  return hasPipeline ? '?pipeline=' + ENV.pipeline : ''
+}
+
+function post (path, body, callback) {
+  console.log('Request URL:', `https://${ENV.hostname}:${ENV.port}${path}`)
   const options = {
     hostname: ENV.hostname,
     port: ENV.port,
-    path: '/_bulk',
+    path: path,
     method: 'POST',
     auth: `${ENV.username}:${password}`,
     headers: {
@@ -138,9 +174,11 @@ function processEvent (event, context, callback) {
     if (decodedPayload.messageType === 'CONTROL_MESSAGE') {
       return callback(null, 'Control message handled successfully.')
     }
-    const transformedPayload = transform(decodedPayload)
+    const hasPipeline = ENV.pipeline &&
+      PIPELINE_REGEXP.test(decodedPayload.logGroup)
+    const transformedPayload = transform(decodedPayload, hasPipeline)
     console.log('Transformed payload:', transformedPayload.replace(/\n/g, ' '))
-    post(transformedPayload, callback)
+    post('/_bulk' + queryString(hasPipeline), transformedPayload, callback)
   })
 }
 

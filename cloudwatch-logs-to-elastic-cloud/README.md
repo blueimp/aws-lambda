@@ -22,7 +22,7 @@ Timeout | 10 sec
 KMS key | aws/lambda
 
 ### Environment variables
-Set the following environment variables for the Lambda function:
+Set the following required environment variables for the Lambda function:
 
 Key      | Value
 ---------|--------------
@@ -30,6 +30,15 @@ hostname | Hostname of the Elasticsearch cluster **HTTPS** endpoint.
 port     | Port number of the Elasticsearch cluster **HTTPS** endpoint.
 username | Name of an ES user with **create_index** and **write** permissions.
 encpass  | [AWS KMS](https://aws.amazon.com/kms/) encrypted password.
+
+Set the following optional environment variables for the Lambda function:
+
+Key        | Value
+-----------|--------------
+pipeline   | The Elasticsearch ingest pipeline to use.
+piperegexp | RegExp matched with the log group if the pipeline applies.
+pipefields | Required fields for the pipeline to add if missing, e.g.:
+           | `http_user_agent= real_ip=127.0.0.1`
 
 ### Trigger configuration
 Add any CloudWatch logs group as trigger for the Lambda function.
