@@ -119,25 +119,30 @@ function transform (payload, hasPipeline) {
 }
 
 function handleResponse (response, callback) {
+  const statusCode = response.statusCode
+  console.log('Status code:', statusCode)
   let responseBody = ''
   response
     .on('data', chunk => { responseBody += chunk })
     .on('end', chunk => {
       console.log('Response:', responseBody)
-      const statusCode = response.statusCode
-      if (statusCode >= 200 && statusCode < 299) {
+      if (statusCode >= 200 && statusCode < 300) {
         const result = JSON.parse(responseBody)
         const items = result.items
-        const failedItems = items.filter(item => {
-          return item.index.status >= 300
-        })
-        console.log('Successful items:', items.length - failedItems.length)
-        console.log('Failed items:', failedItems.length)
-        if (result.errors || failedItems.length) {
-          return callback(JSON.stringify({statusCode, result}))
+        const failed = items.reduce((num, item) => {
+          return item.index.status >= 300 ? ++num : num
+        }, 0)
+        console.log('Successful items:', items.length - failed)
+        console.log('Failed items:', failed)
+        if (result.errors || failed) {
+          return callback(
+            new Error(`Request failed for ${failed} of ${items.length} items.`)
+          )
         }
       } else {
-        return callback(JSON.stringify({statusCode, responseBody}))
+        return callback(
+          new Error(`Request failed with status code ${statusCode}.`)
+        )
       }
       callback(null, 'Request completed successfully.')
     })
