@@ -95,11 +95,15 @@ function buildSlackMessage (data) {
   }
 }
 
+function parseSNSMessage (message) {
+  console.log('SNS Message:', message)
+  return JSON.parse(message)
+}
+
 function processEvent (event, context, callback) {
   console.log('Event:', JSON.stringify(event))
-  const snsMessage = event.Records[0].Sns.Message
-  console.log('SNS Message:', snsMessage)
-  const postData = buildSlackMessage(JSON.parse(snsMessage))
+  const snsMessage = parseSNSMessage(event.Records[0].Sns.Message)
+  const postData = buildSlackMessage(snsMessage)
   post(webhook, postData, callback)
 }
 
