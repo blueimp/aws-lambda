@@ -1,4 +1,4 @@
-# aws-eb-events-to-slack
+# elastic-beanstalk-events-to-slack
 [AWS Elastic Beanstalk](https://aws.amazon.com/elasticbeanstalk/) events to
 [Slack](https://slack.com/) streaming function for
 [AWS Lambda](https://aws.amazon.com/lambda/).

@@ -1,5 +1,5 @@
 /*
- * AWS Elastic Beanstalk events to Slack streaming function for AWS Lambda.
+ * Elastic Beanstalk events to Slack streaming function for AWS Lambda.
  * https://github.com/blueimp/aws-lambda
  *
  * Required environment variables:
