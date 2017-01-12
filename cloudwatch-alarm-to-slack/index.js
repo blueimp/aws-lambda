@@ -3,10 +3,13 @@
  * https://github.com/blueimp/aws-lambda
  *
  * Required environment variables:
- * - webhook: AWS KMS encrypted Slack WebHook URL.
+ * - webhook:     AWS KMS encrypted Slack WebHook URL.
  *
  * Optional environment variables:
- * - channel: Slack channel to send the notifications to.
+ * - channel:     Slack channel to send the messages to.
+ * - username:    Bot username used for the slack messages.
+ * - icon_emoji:  Bot icon emoji used for the slack messages.
+ * - icon_url:    Bot icon url used for the slack messages.
  *
  * Copyright 2017, Sebastian Tschan
  * https://blueimp.net
@@ -66,6 +69,9 @@ function post (requestURL, data, callback) {
 function buildSlackMessage (data) {
   return {
     channel: ENV.channel,
+    username: ENV.username,
+    icon_emoji: ENV.icon_emoji,
+    icon_url: ENV.icon_url,
     attachments: [{
       fallback: data.AlarmName,
       title: data.AlarmName,

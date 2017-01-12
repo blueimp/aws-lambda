@@ -24,11 +24,14 @@ Key     | Value
 --------|--------------
 webhook | [AWS KMS](https://aws.amazon.com/kms/) encrypted Slack WebHook URL.
 
-Set the following optional environment variable for the Lambda function:
+Set the following optional environment variables for the Lambda function:
 
-Key     | Value
---------|--------------
-channel | Slack channel to send the notifications to.
+Key        | Value
+-----------|--------------
+channel    | Slack channel to send the notifications to.
+username   | Bot username used for the slack messages.
+icon_emoji | Bot icon emoji used for the slack messages.
+icon_url   | Bot icon url used for the slack messages.
 
 ### Trigger configuration
 Add the desired [Amazon SNS](https://aws.amazon.com/sns/) topic as trigger for
