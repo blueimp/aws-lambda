@@ -1,5 +1,5 @@
 # authorize-ip
-[AWS Lambda](https://console.aws.amazon.com/lambda) function to authorize the
+[AWS Lambda](https://aws.amazon.com/lambda/) function to authorize the
 client IP for an EC2 security group.  
 Meant to be used with [Amazon API Gateway](https://aws.amazon.com/api-gateway/).
 

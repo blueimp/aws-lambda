@@ -1,6 +1,6 @@
 # Setup
 
-1. Add the function to [AWS Lambda](https://console.aws.amazon.com/lambda).  
+1. Add the function to [AWS Lambda](https://aws.amazon.com/lambda/).  
    Replace the Slack Webhook path with your own.  
    Choose a basic execution role and the minimum resource values.
 

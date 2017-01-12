@@ -1,6 +1,6 @@
 # cloudwatch-logs-to-elastic-cloud
 CloudWatch Logs to Elasticsearch streaming function for
-[AWS Lambda](https://console.aws.amazon.com/lambda).
+[AWS Lambda](https://aws.amazon.com/lambda/).
 
 This is provided as alternative to the AWS Elasticsearch Service streaming
 Lambda function and supports any Elasticsearch service with an

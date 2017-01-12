@@ -3,7 +3,7 @@
 1. Create a new subscription topic on
    [AWS SNS](https://console.aws.amazon.com/sns) and copy the topic ARN.
 
-2. Add the function to [AWS Lambda](https://console.aws.amazon.com/lambda).  
+2. Add the function to [AWS Lambda](https://aws.amazon.com/lambda/).  
    Replace the Slack Webhook path with your own.  
    Choose a basic execution role and the minimum resource values.  
    Add the created SNS topic as event source.
