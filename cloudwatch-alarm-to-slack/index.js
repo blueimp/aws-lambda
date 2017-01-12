@@ -72,24 +72,26 @@ function buildSlackMessage (data) {
     username: ENV.username,
     icon_emoji: ENV.icon_emoji,
     icon_url: ENV.icon_url,
-    attachments: [{
-      fallback: data.AlarmName,
-      title: data.AlarmName,
-      text: data.AlarmDescription,
-      color: statusColors[data.NewStateValue],
-      fields: [
-        {
-          title: 'Status',
-          value: data.NewStateValue,
-          short: true
-        },
-        {
-          title: 'Region',
-          value: data.Region,
-          short: true
-        }
-      ]
-    }]
+    attachments: [
+      {
+        fallback: data.AlarmName,
+        title: data.AlarmName,
+        text: data.AlarmDescription,
+        color: statusColors[data.NewStateValue],
+        fields: [
+          {
+            title: 'Status',
+            value: data.NewStateValue,
+            short: true
+          },
+          {
+            title: 'Region',
+            value: data.Region,
+            short: true
+          }
+        ]
+      }
+    ]
   }
 }
 
