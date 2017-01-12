@@ -1,0 +1,22 @@
+{
+  "Records": [
+    {
+      "EventSource": "aws:sns",
+      "EventVersion": "1.0",
+      "EventSubscriptionArn": "arn:aws:sns:eu-west-1:000000000000:eb-deployments:xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+      "Sns": {
+        "Type": "Notification",
+        "MessageId": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+        "TopicArn": "arn:aws:sns:eu-west-1:000000000000:eb-deployments",
+        "Subject": "AWS Elastic Beanstalk Notification - Environment health has transitioned from Ok to Info. Applica...",
+        "Message": "Timestamp: Thu Jan 12 20:56:18 UTC 2017\nMessage: Environment health has transitioned from Ok to Info. Application update in progress (running for 34 seconds).\n\nEnvironment: example-environment\nApplication: example-application\n\nEnvironment URL: http://example.org\nNotificationProcessId: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+        "Timestamp": "2017-01-12T20:57:00.592Z",
+        "SignatureVersion": "1",
+        "Signature": "Cg==",
+        "SigningCertUrl": "https://sns.eu-west-1.amazonaws.com/SimpleNotificationService-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.pem",
+        "UnsubscribeUrl": "https://sns.eu-west-1.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:eu-west-1:000000000000:eb-deployments:xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+        "MessageAttributes": {}
+      }
+    }
+  ]
+}
