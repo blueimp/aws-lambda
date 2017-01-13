@@ -101,6 +101,7 @@ function post (requestURL, data, callback) {
 
 function getStatusColor (data) {
   const message = data.Message
+  if (!message) return
   let color
   STATUS_TYPES.every(type => {
     return type.messages.every(msg => {
