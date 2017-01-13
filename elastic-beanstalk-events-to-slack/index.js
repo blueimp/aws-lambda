@@ -34,7 +34,7 @@ const STATUS_TYPES = [
     color: 'good',
     messages: [
       ' to GREEN.',
-      ' to OK.',
+      ' to Ok.',
       'New application version was deployed'
     ]
   },
