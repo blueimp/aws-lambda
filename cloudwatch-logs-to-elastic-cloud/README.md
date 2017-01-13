@@ -43,6 +43,26 @@ pipefields | Required fields for the pipeline to add if missing, e.g.:
 ### Trigger configuration
 Add any CloudWatch logs group as trigger for the Lambda function.
 
+### Test event generation
+The CloudWatch logs are forwarded to AWS Lambda with the following payload:
+
+```json
+{"awslogs":{"data":"BASE64ENCODED_GZIP_COMPRESSED_DATA"}}
+```
+
+The decoded and decompressed data has the format shown in `awslogs-data.json`,
+which we can use to edit the test log events.
+
+Execute the following command to read `awslogs-data.json`, gzip it and store its
+one-line base64 representation as `awslogs.data` property of `test-event.json`:
+
+```sh
+jq -n --arg data $(jq -cj . awslogs-data.json | gzip | base64 | tr -d '\n') \
+  '{awslogs:{data:$data}}' > test-event.json
+```
+
+This command requires [jq](https://stedolan.github.io/jq/).
+
 ## License
 Released under the [MIT license](https://opensource.org/licenses/MIT).
 
