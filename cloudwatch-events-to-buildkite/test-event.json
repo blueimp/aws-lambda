@@ -1,0 +1,16 @@
+{
+  "pipeline": "example",
+  "branch": "master",
+  "commit": "HEAD",
+  "message": ":robot_face: test build",
+  "author": {
+    "name": "Bender Bending Rodríguez",
+    "email": "bender@example.org"
+  },
+  "env": {
+    "TESTBUILD": "true"
+  },
+  "meta_data": {
+    "testbuild": "true"
+  }
+}
