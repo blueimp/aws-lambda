@@ -33,24 +33,24 @@ const STATUS_TYPES = [
   {
     color: 'good',
     messages: [
-      ' to GREEN.',
-      ' to Ok.',
+      ' to GREEN',
+      ' to Ok',
       'New application version was deployed'
     ]
   },
   {
     color: 'warning',
     messages: [
-      ' to YELLOW.',
-      ' to Warning.'
+      ' to YELLOW',
+      ' to Warning'
     ]
   },
   {
     color: 'danger',
     messages: [
-      ' to RED.',
-      ' to Degraded.',
-      ' to Severe.',
+      ' to RED',
+      ' to Degraded',
+      ' to Severe',
       'Unsuccessful command execution',
       'Failed to deploy'
     ]
