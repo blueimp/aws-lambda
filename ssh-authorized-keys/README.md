@@ -85,6 +85,7 @@ https://ID.execute-api.REGION.amazonaws.com/prod/ssh-authorized-keys
     /usr/local/bin/ssh-authorized-keys
 
 # Configure sshd to lookup public keys via ssh-authorized-keys command:
+sed -i '/^AuthorizedKeysCommand/d' /etc/ssh/sshd_config
 echo '
 AuthorizedKeysCommand /usr/local/bin/ssh-authorized-keys
 AuthorizedKeysCommandUser nobody
