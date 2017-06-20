@@ -108,7 +108,10 @@ function buildSource (logEvent, payload, hasPipeline) {
 
 function transform (payload, hasPipeline) {
   let bulkRequestBody = ''
-  const index = payload.logGroup.replace(/\W|_/g, '-').toLowerCase().replace(/^\-/, "idx-");
+  const index = payload.logGroup
+                  .replace(/\W+|_+/g, '-')
+                  .replace(/^\-/, '')
+                  .toLowerCase();
 
   payload.logEvents.forEach(logEvent => {
     bulkRequestBody += [
