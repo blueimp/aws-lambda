@@ -112,7 +112,6 @@ function transform (payload, hasPipeline) {
                   .replace(/\W+|_+/g, '-')
                   .replace(/^\-/, '')
                   .toLowerCase()
-
   payload.logEvents.forEach(logEvent => {
     bulkRequestBody += [
       JSON.stringify(buildAction(logEvent, payload, index)),
