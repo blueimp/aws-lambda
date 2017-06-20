@@ -111,7 +111,7 @@ function transform (payload, hasPipeline) {
   const index = payload.logGroup
                   .replace(/\W+|_+/g, '-')
                   .replace(/^\-/, '')
-                  .toLowerCase();
+                  .toLowerCase()
 
   payload.logEvents.forEach(logEvent => {
     bulkRequestBody += [
