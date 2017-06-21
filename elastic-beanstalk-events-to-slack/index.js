@@ -166,7 +166,7 @@ function processEvent (event, context, callback) {
 
 function decryptAndProcess (event, context, callback) {
   const kms = new AWS.KMS()
-  const enc = {CiphertextBlob: new Buffer(ENV.webhook, 'base64')}
+  const enc = {CiphertextBlob: Buffer.from(ENV.webhook, 'base64')}
   kms.decrypt(enc, (err, data) => {
     if (err) return callback(err)
     webhook = data.Plaintext.toString('ascii')

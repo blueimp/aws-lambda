@@ -174,7 +174,7 @@ function post (path, body, callback) {
 }
 
 function processEvent (event, context, callback) {
-  const payload = new Buffer(event.awslogs.data, 'base64')
+  const payload = Buffer.from(event.awslogs.data, 'base64')
   zlib.gunzip(payload, (err, res) => {
     if (err) return callback(err)
     const decodedPayload = JSON.parse(res.toString('utf8'))
@@ -192,7 +192,7 @@ function processEvent (event, context, callback) {
 
 function decryptAndProcess (event, context, callback) {
   const kms = new AWS.KMS()
-  const enc = {CiphertextBlob: new Buffer(ENV.encpass, 'base64')}
+  const enc = {CiphertextBlob: Buffer.from(ENV.encpass, 'base64')}
   kms.decrypt(enc, (err, data) => {
     if (err) return callback(err)
     password = data.Plaintext.toString('ascii')

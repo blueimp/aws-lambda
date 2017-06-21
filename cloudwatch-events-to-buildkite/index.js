@@ -94,7 +94,7 @@ function processEvent (event, context, callback) {
 
 function decryptAndProcess (event, context, callback) {
   const kms = new AWS.KMS()
-  const enc = {CiphertextBlob: new Buffer(ENV.token, 'base64')}
+  const enc = {CiphertextBlob: Buffer.from(ENV.token, 'base64')}
   kms.decrypt(enc, (err, data) => {
     if (err) return callback(err)
     token = data.Plaintext.toString('ascii')
