@@ -1,0 +1,30 @@
+{
+  "name": "aws-lambda",
+  "version": "1.0.0",
+  "description": "A collection of functions for AWS Lambda.",
+  "keywords": [
+    "aws",
+    "lambda"
+  ],
+  "homepage": "https://github.com/blueimp/aws-lambda",
+  "author": {
+    "name": "Sebastian Tschan",
+    "url": "https://blueimp.net"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/blueimp/aws-lambda.git"
+  },
+  "license": "MIT",
+  "scripts": {
+    "test": "eslint ."
+  },
+  "devDependencies": {
+    "eslint": "^4.0.0",
+    "eslint-config-standard": "^10.2.1",
+    "eslint-plugin-import": "^2.3.0",
+    "eslint-plugin-node": "^5.0.0",
+    "eslint-plugin-promise": "^3.5.0",
+    "eslint-plugin-standard": "^3.0.1"
+  }
+}
