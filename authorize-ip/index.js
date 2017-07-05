@@ -24,39 +24,93 @@
 const ENV = process.env
 if (!ENV.groupid) throw new Error('Missing environment variable: groupid')
 
+const PROTOCOL = ENV.protocol || 'tcp'
+const PORT = ENV.port || 22
+
 const AWS = require('aws-sdk')
 const EC2 = new AWS.EC2()
 
-function authorizeIP (ip, callback) {
+function authorizeIP (ip) {
   const networkMask = ip.indexOf(':') > -1 ? '/128' : '/32'
   const params = {
     GroupId: ENV.groupid,
-    IpProtocol: ENV.protocol || 'tcp',
-    FromPort: ENV.port || 22,
-    ToPort: ENV.port || 22,
+    IpProtocol: PROTOCOL,
+    FromPort: PORT,
+    ToPort: PORT,
     CidrIp: ip + networkMask
   }
-  EC2.authorizeSecurityGroupIngress(params, (err, data) => {
-    if (err) {
-      if (err.code === 'InvalidPermission.Duplicate') {
-        console.log('IP already authorized:', ip)
-      } else {
-        return callback(err)
+  return new Promise((resolve, reject) => {
+    EC2.authorizeSecurityGroupIngress(params).promise()
+      .then(data => {
+        console.log('IP newly authorized:', ip)
+        resolve({ip})
+      })
+      .catch(err => {
+        if (err.code === 'InvalidPermission.Duplicate') {
+          console.log('IP already authorized:', ip)
+          return resolve({ip})
+        }
+        reject(err)
+      })
+  })
+}
+
+function cleanupIPs () {
+  const params = {
+    GroupIds: [ENV.groupid],
+    Filters: [
+      {
+        Name: 'ip-permission.protocol',
+        Values: [PROTOCOL]
+      },
+      {
+        Name: 'ip-permission.from-port',
+        Values: [PORT.toString()]
+      },
+      {
+        Name: 'ip-permission.to-port',
+        Values: [PORT.toString()]
       }
-    } else {
-      console.log('IP newly authorized:', ip)
+    ]
+  }
+  return EC2.describeSecurityGroups(params).promise().then(data => {
+    const ipPermissions = data.SecurityGroups.length
+      ? data.SecurityGroups[0].IpPermissions
+      : []
+    console.log('IP permissions:', JSON.stringify(ipPermissions))
+    if (!ipPermissions.length) return null
+    // IP permission properties that produce parameter errors when empty:
+    const arrayProps = [
+      'UserIdGroupPairs',
+      'PrefixListIds',
+      'IpRanges',
+      'Ipv6Ranges'
+    ]
+    ipPermissions.forEach(perm => {
+      arrayProps.forEach(prop => {
+        if (!perm[prop].length) delete perm[prop]
+      })
+    })
+    const params = {
+      GroupId: ENV.groupid,
+      IpPermissions: ipPermissions
     }
-    const response = {
-      statusCode: 200,
-      headers: {},
-      body: JSON.stringify({ip})
-    }
-    callback(null, response)
+    return EC2.revokeSecurityGroupIngress(params).promise()
   })
 }
 
 exports.handler = (event, context, callback) => {
   console.log('Event:', JSON.stringify(event))
+  if (event.source === 'aws.events') {
+    return cleanupIPs()
+      .then(data => callback(null, data))
+      .catch(callback)
+  }
   const ip = event.requestContext.identity.sourceIp
-  authorizeIP(ip, callback)
+  authorizeIP(ip)
+    .then(data => callback(null, {
+      statusCode: 200,
+      body: JSON.stringify(data)
+    }))
+    .catch(callback)
 }

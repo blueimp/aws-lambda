@@ -19,15 +19,25 @@ Attach an additional inline policy with the following content, replacing
     {
       "Effect": "Allow",
       "Action": [
-        "ec2:AuthorizeSecurityGroupIngress"
+        "ec2:AuthorizeSecurityGroupIngress",
+        "ec2:RevokeSecurityGroupIngress"
       ],
-      "Resource": [
-        "arn:aws:ec2:REGION:ACCOUNT_ID:security-group/GROUP_ID"
-      ]
+      "Resource": "arn:aws:ec2:REGION:ACCOUNT_ID:security-group/GROUP_ID"
+    },
+    {
+      "Effect": "Allow",
+      "Action": "ec2:DescribeSecurityGroups",
+      "Resource": "*"
     }
   ]
 }
 ```
+
+**Notice:**  
+> The `ec2:DescribeSecurityGroups` action currently does not support
+> [resource-level permissions](http://docs.aws.amazon.com/AWSEC2/latest/APIReference/ec2-api-permissions.html);
+> therefore, the `*` wildcard is used for the Resource element in the
+> statement.
 
 ### Function configuration
 Add the function code to AWS Lambda with the following configuration options:  
@@ -55,7 +65,14 @@ protocol | The protocol to authorize, defaults to ``"tcp"``.
 port     | The port to authorize, defaults to `22` (SSH).
 
 ### Trigger configuration
-Add an API Gateway trigger, e.g. with API Key security.
+Add an `API Gateway` trigger with API Key security.  
+This endpoint can then be used to authorize the IP of the requesting client.  
+[test-event.json](test-event.json) contains a sample API Gateway event.
+
+To regularly cleanup previously authorized IPs, add a `Cloudwatch Events`
+trigger with a cron expression, e.g. `cron(0 3 * * ? *)` to run at 03:00 am
+(UTC) every night.  
+[test-event2.json](test-event2.json) contains sample Cloudwatch Event data.
 
 ## License
 Released under the [MIT license](https://opensource.org/licenses/MIT).
