@@ -8,6 +8,7 @@ A collection of functions for [AWS Lambda](https://aws.amazon.com/lambda/).
 * [CloudWatch Events to BuildKite](cloudwatch-events-to-buildkite)
 * [CloudWatch Logs to Elastic Cloud](cloudwatch-logs-to-elastic-cloud)
 * [Elastic Beanstalk events to Slack](elastic-beanstalk-events-to-slack)
+* [Security headers for CloudFront](cloudfront-security-headers)
 
 ## License
 Released under the [MIT license](https://opensource.org/licenses/MIT).
