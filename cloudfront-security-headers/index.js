@@ -24,7 +24,7 @@ const headers = {
   // Require HTTPS for resource loading, allow inline code, disable plugins:
   'Content-Security-Policy':
     "default-src https: 'unsafe-inline'; " +
-    'img-src https: data:; ' +
+    'img-src https: data: blob:; ' +
     "object-src 'none'; " +
     "frame-ancestors 'self';",
   // Only allow frame embedding on the same origin:
