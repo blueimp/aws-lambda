@@ -14,13 +14,6 @@
 const headers = {
   // Instruct browsers to only interact with the site via HTTPS:
   'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
-  // Pinned SSL keys are the intermediate certificate in use and a backup key:
-  // 1. Amazon intermediate: "s:/C=US/O=Amazon/OU=Server CA 1B/CN=Amazon"
-  // 2. Let’s Encrypt Authority X1 (IdenTrust cross-signed)
-  'Public-Key-Pins':
-    'pin-sha256="JSMzqOOrtyOT1kmau6zKhgT676hGgczD5VMdRMyJZFA="; ' +
-    'pin-sha256="YLh1dUR9y6Kja30RrAn7JKnbQG/uEtLMkBgFF2Fuihg="; ' +
-    'max-age=2592000; includeSubDomains',
   // Require HTTPS for resource loading, allow inline code, disable plugins:
   'Content-Security-Policy':
     "default-src https: 'unsafe-inline'; " +
