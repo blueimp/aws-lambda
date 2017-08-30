@@ -1,0 +1,51 @@
+{
+  "resource": "/",
+  "path": "/",
+  "httpMethod": "GET",
+  "headers": {
+    "Accept": "*/*",
+    "CloudFront-Forwarded-Proto": "https",
+    "CloudFront-Is-Desktop-Viewer": "true",
+    "CloudFront-Is-Mobile-Viewer": "false",
+    "CloudFront-Is-SmartTV-Viewer": "false",
+    "CloudFront-Is-Tablet-Viewer": "false",
+    "CloudFront-Viewer-Country": "DE",
+    "Host": "example.org",
+    "User-Agent": "curl/7.54.0",
+    "Via": "1.1 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.cloudfront.net (CloudFront)",
+    "X-Amz-Cf-Id": "Cg==",
+    "X-Amzn-Trace-Id": "Root=1-xxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxx",
+    "X-Forwarded-For": "127.0.0.1, 192.168.1.1",
+    "X-Forwarded-Port": "443",
+    "X-Forwarded-Proto": "https"
+  },
+  "queryStringParameters": null,
+  "pathParameters": null,
+  "stageVariables": null,
+  "requestContext": {
+    "path": "/",
+    "accountId": "000000000000",
+    "resourceId": "xxxxxxxxxx",
+    "stage": "prod",
+    "requestId": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+    "identity": {
+      "cognitoIdentityPoolId": null,
+      "accountId": null,
+      "cognitoIdentityId": null,
+      "caller": null,
+      "apiKey": "",
+      "sourceIp": "127.0.0.1",
+      "accessKey": null,
+      "cognitoAuthenticationType": null,
+      "cognitoAuthenticationProvider": null,
+      "userArn": null,
+      "userAgent": "curl/7.54.0",
+      "user": null
+    },
+    "resourcePath": "/",
+    "httpMethod": "GET",
+    "apiId": "xxxxxxxxxx"
+  },
+  "body": null,
+  "isBase64Encoded": false
+}
