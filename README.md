@@ -10,6 +10,7 @@ A collection of functions for [AWS Lambda](https://aws.amazon.com/lambda/).
 * [Elastic Beanstalk events to Slack](elastic-beanstalk-events-to-slack)
 * [Subdomain or parent domain redirect](subdomain-redirect)
 * [Security headers for CloudFront](cloudfront-security-headers)
+* [Host header as X-Forwarded-Host for CloudFront](cloudfront-forwarded-host)
 
 ## License
 Released under the [MIT license](https://opensource.org/licenses/MIT).

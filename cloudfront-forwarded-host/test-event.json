@@ -1,0 +1,30 @@
+{
+  "Records": [
+    {
+      "cf": {
+        "config": {
+          "distributionId": "EXAMPLE"
+        },
+        "request": {
+          "clientIp": "127.0.0.1",
+          "method": "GET",
+          "uri": "/",
+          "headers": {
+            "host": [
+              {
+                "key": "Host",
+                "value": "example.org"
+              }
+            ],
+            "user-agent": [
+              {
+                "key": "User-Agent",
+                "value": "curl/7.51.0"
+              }
+            ]
+          }
+        }
+      }
+    }
+  ]
+}
