@@ -1,6 +1,7 @@
 # cloudfront-security-headers
 [AWS Lambda@Edge](https://aws.amazon.com/lambda/edge/) function to add common
-security headers for static content served via CloudFront.
+security headers for static content served via
+[CloudFront](https://aws.amazon.com/cloudfront/).
 
 ## Setup
 
