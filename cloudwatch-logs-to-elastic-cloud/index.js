@@ -86,7 +86,7 @@ function buildAction (logEvent, payload, index) {
   return {
     index: {
       _index: index,
-      _type: payload.logGroup,
+      _type: index,
       _id: logEvent.id
     }
   }
