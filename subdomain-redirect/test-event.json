@@ -19,7 +19,10 @@
     "X-Forwarded-Port": "443",
     "X-Forwarded-Proto": "https"
   },
-  "queryStringParameters": null,
+  "queryStringParameters": {
+    "country": "日本",
+    "number": "42"
+  },
   "pathParameters": null,
   "stageVariables": null,
   "requestContext": {

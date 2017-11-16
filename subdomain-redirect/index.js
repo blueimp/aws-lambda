@@ -34,7 +34,16 @@ exports.handler = (event, context, callback) => {
   const redirectHost = regexp.test(host)
     ? host.slice(label.length + 1)
     : `${label}.${host}`
-  const location = `${scheme}://${redirectHost}${event.path}`
+  const params = event.queryStringParameters
+  const queryString = params
+    ? '?' +
+      Object.keys(params)
+        .map(key => {
+          return `${key}=${encodeURIComponent(params[key])}`
+        })
+        .join('&')
+    : ''
+  const location = `${scheme}://${redirectHost}${event.path}${queryString}`
   const response = {
     statusCode,
     headers: { location, 'content-type': contentType }
