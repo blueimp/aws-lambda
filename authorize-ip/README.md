@@ -59,10 +59,11 @@ groupid  | The ID of the security group, e.g. ``"sg-xxxxxxxx"``.
 
 Set the following optional environment variables for the Lambda function:
 
-Key      | Value
----------|--------------
-protocol | The protocol to authorize, defaults to ``"tcp"``.
-port     | The port to authorize, defaults to `22` (SSH).
+Key         | Value
+------------|--------------
+protocol    | The protocol to authorize, defaults to ``"tcp"``.
+port        | The port to authorize, defaults to `22` (SSH).
+description | Description for the inbound rule, defaults to `"authorize-ip"`.
 
 ### Trigger configuration
 Add an `API Gateway` trigger with API Key security.  
