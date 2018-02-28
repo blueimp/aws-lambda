@@ -6,9 +6,10 @@
  * - groupid:  The ID of the security group, e.g. "sg-xxxxxxxx".
  *
  * Optional environment variables:
- * - protocol:    The protocol to authorize, defaults to "tcp".
- * - port:        The port to authorize, defaults to 22 (SSH).
- * - description: Description for the inbound rule, defaults to "authorize-ip".
+ * - protocol:     The protocol to authorize, defaults to "tcp".
+ * - port:         The port to authorize, defaults to 22 (SSH).
+ * - description:  Description for the inbound rule, defaults to "authorize-ip".
+ * - keepipranges: Comma-separated IP ranges to exclude from cleanup.
  *
  * Meant to be used with Amazon API Gateway, which sets the following property:
  * - event.requestContext.identity.sourceIp
@@ -100,21 +101,29 @@ function cleanupIPs () {
         : []
       console.log('IP permissions:', JSON.stringify(ipPermissions))
       if (!ipPermissions.length) return null
-      // IP permission properties that produce parameter errors when empty:
-      const arrayProps = [
-        'UserIdGroupPairs',
-        'PrefixListIds',
-        'IpRanges',
-        'Ipv6Ranges'
-      ]
-      ipPermissions.forEach(perm => {
-        arrayProps.forEach(prop => {
-          if (!perm[prop].length) delete perm[prop]
-        })
-      })
+      const keepIpRanges = (ENV.keepipranges || '').split(',')
+      const revokeIpPermissions = ipPermissions.reduce((permissions, perm) => {
+        const IpRanges = perm.IpRanges.filter(
+          ipRange => !keepIpRanges.includes(ipRange.CidrIp)
+        )
+        const Ipv6Ranges = perm.Ipv6Ranges.filter(
+          ipv6Range => !keepIpRanges.includes(ipv6Range.CidrIpv6)
+        )
+        if (!IpRanges.length && !Ipv6Ranges.length) return permissions
+        const permission = {
+          IpProtocol: perm.IpProtocol,
+          FromPort: perm.FromPort,
+          ToPort: perm.ToPort
+        }
+        // IpRanges/Ipv6Ranges produce parameter errors when empty:
+        if (IpRanges.length) permission.IpRanges = IpRanges
+        if (Ipv6Ranges.length) permission.Ipv6Ranges = Ipv6Ranges
+        return [...permissions, permission]
+      }, [])
+      if (!revokeIpPermissions.length) return null
       const params = {
         GroupId: ENV.groupid,
-        IpPermissions: ipPermissions
+        IpPermissions: revokeIpPermissions
       }
       return EC2.revokeSecurityGroupIngress(params).promise()
     })
