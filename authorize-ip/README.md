@@ -67,7 +67,7 @@ description  | Description for the inbound rule, defaults to `"authorize-ip"`.
 keepipranges | Comma-separated IP ranges to exclude from cleanup.
 
 ### Trigger configuration
-Add an `API Gateway` trigger with API Key security.  
+Add an `API Gateway` trigger.  
 This endpoint can then be used to authorize the IP of the requesting client.  
 [test-event.json](test-event.json) contains a sample API Gateway event.
 
