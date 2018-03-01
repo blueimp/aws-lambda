@@ -31,7 +31,7 @@ function getSSHPublicKeyIDs (userName) {
   return IAM.listSSHPublicKeys({
     UserName: userName
   }).promise().then(data => data.SSHPublicKeys.reduce((ids, key) => {
-    if (key.Status === 'Active') ids.push(key.SSHPublicKeyId)
+    if (key.Status === 'Active') return [...ids, key.SSHPublicKeyId]
     return ids
   }, []))
 }
