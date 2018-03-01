@@ -32,18 +32,11 @@ const https = require('https')
 const STATUS_TYPES = [
   {
     color: 'good',
-    messages: [
-      ' to GREEN',
-      ' to Ok',
-      'New application version was deployed'
-    ]
+    messages: [' to GREEN', ' to Ok', 'New application version was deployed']
   },
   {
     color: 'warning',
-    messages: [
-      ' to YELLOW',
-      ' to Warning'
-    ]
+    messages: [' to YELLOW', ' to Warning']
   },
   {
     color: 'danger',
@@ -63,17 +56,16 @@ const EXCLUDE_KEYS = [
   'RequestId',
   'Timestamp'
 ]
-const SHORT_KEYS = [
-  'Application',
-  'Environment'
-]
+const SHORT_KEYS = ['Application', 'Environment']
 
 function handleResponse (response, callback) {
   const statusCode = response.statusCode
   console.log('Status code:', statusCode)
   let responseBody = ''
   response
-    .on('data', chunk => { responseBody += chunk })
+    .on('data', chunk => {
+      responseBody += chunk
+    })
     .on('end', chunk => {
       console.log('Response:', responseBody)
       if (statusCode >= 200 && statusCode < 300) {
@@ -94,8 +86,13 @@ function post (requestURL, data, callback) {
   }
   console.log('Request options:', JSON.stringify(options))
   console.log('Request body:', body)
-  https.request(options, response => { handleResponse(response, callback) })
-    .on('error', err => { callback(err) })
+  https
+    .request(options, response => {
+      handleResponse(response, callback)
+    })
+    .on('error', err => {
+      callback(err)
+    })
     .end(body)
 }
 
@@ -103,10 +100,11 @@ function getStatusColor (data) {
   const message = data.Message
   if (!message) return
   let color
-  STATUS_TYPES.every(type => {
-    return type.messages.every(msg => {
-      if (message.indexOf(msg) === -1) return true
+  STATUS_TYPES.some(type => {
+    return type.messages.some(msg => {
+      if (message.indexOf(msg) === -1) return false
       color = type.color
+      return true
     })
   })
   return color
@@ -115,11 +113,14 @@ function getStatusColor (data) {
 function generateAttachmentFields (data) {
   return Object.keys(data).reduce((fields, key) => {
     if (EXCLUDE_KEYS.indexOf(key) === -1) {
-      fields.push({
-        title: key,
-        value: data[key],
-        short: SHORT_KEYS.indexOf(key) > -1
-      })
+      return [
+        ...fields,
+        {
+          title: key,
+          value: data[key],
+          short: SHORT_KEYS.indexOf(key) > -1
+        }
+      ]
     }
     return fields
   }, [])
@@ -148,7 +149,9 @@ function parseSNSMessage (message) {
       const key = line.split(':', 1)[0]
       const value = line.substr(key.length + 2)
       if (key !== 'Environment URL' || value !== 'http://null') {
-        obj[key] = value
+        const newObj = Object.assign({}, obj)
+        newObj[key] = value
+        return newObj
       }
     }
     return obj
@@ -166,7 +169,7 @@ function processEvent (event, context, callback) {
 
 function decryptAndProcess (event, context, callback) {
   const kms = new AWS.KMS()
-  const enc = {CiphertextBlob: Buffer.from(ENV.webhook, 'base64')}
+  const enc = { CiphertextBlob: Buffer.from(ENV.webhook, 'base64') }
   kms.decrypt(enc, (err, data) => {
     if (err) return callback(err)
     webhook = data.Plaintext.toString('ascii')
