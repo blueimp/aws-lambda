@@ -33,7 +33,7 @@ const headers = {
 // Transform the headers to CloudFronts key value array format:
 const transformedHeaders = {}
 Object.keys(headers).forEach(key => {
-  transformedHeaders[key.toLowerCase()] = [{key, value: headers[key]}]
+  transformedHeaders[key.toLowerCase()] = [{ key, value: headers[key] }]
 })
 
 exports.handler = (event, context, callback) => {

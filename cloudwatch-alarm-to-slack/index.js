@@ -40,7 +40,9 @@ function handleResponse (response, callback) {
   console.log('Status code:', statusCode)
   let responseBody = ''
   response
-    .on('data', chunk => { responseBody += chunk })
+    .on('data', chunk => {
+      responseBody += chunk
+    })
     .on('end', chunk => {
       console.log('Response:', responseBody)
       if (statusCode >= 200 && statusCode < 300) {
@@ -61,8 +63,13 @@ function post (requestURL, data, callback) {
   }
   console.log('Request options:', JSON.stringify(options))
   console.log('Request body:', body)
-  https.request(options, response => { handleResponse(response, callback) })
-    .on('error', err => { callback(err) })
+  https
+    .request(options, response => {
+      handleResponse(response, callback)
+    })
+    .on('error', err => {
+      callback(err)
+    })
     .end(body)
 }
 
@@ -109,7 +116,7 @@ function processEvent (event, context, callback) {
 
 function decryptAndProcess (event, context, callback) {
   const kms = new AWS.KMS()
-  const enc = {CiphertextBlob: Buffer.from(ENV.webhook, 'base64')}
+  const enc = { CiphertextBlob: Buffer.from(ENV.webhook, 'base64') }
   kms.decrypt(enc, (err, data) => {
     if (err) return callback(err)
     webhook = data.Plaintext.toString('ascii')

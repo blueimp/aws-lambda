@@ -44,7 +44,9 @@ function extractJSON (message) {
   if (jsonStart < 0) return null
   try {
     return JSON.parse(message.substring(jsonStart))
-  } catch (e) { return null }
+  } catch (e) {
+    return null
+  }
 }
 
 function isNumeric (n) {
@@ -113,10 +115,11 @@ function transform (payload, hasPipeline) {
     .replace(/^-/, '')
     .toLowerCase()
   payload.logEvents.forEach(logEvent => {
-    bulkRequestBody += [
-      JSON.stringify(buildAction(logEvent, payload, index)),
-      JSON.stringify(buildSource(logEvent, payload, hasPipeline))
-    ].join('\n') + '\n'
+    bulkRequestBody +=
+      [
+        JSON.stringify(buildAction(logEvent, payload, index)),
+        JSON.stringify(buildSource(logEvent, payload, hasPipeline))
+      ].join('\n') + '\n'
   })
   return bulkRequestBody
 }
@@ -126,7 +129,9 @@ function handleResponse (response, callback) {
   console.log('Status code:', statusCode)
   let responseBody = ''
   response
-    .on('data', chunk => { responseBody += chunk })
+    .on('data', chunk => {
+      responseBody += chunk
+    })
     .on('end', chunk => {
       console.log('Response:', responseBody)
       if (statusCode >= 200 && statusCode < 300) {
@@ -168,8 +173,13 @@ function post (path, body, callback) {
       'Content-Length': Buffer.byteLength(body)
     }
   }
-  https.request(options, response => { handleResponse(response, callback) })
-    .on('error', err => { callback(err) })
+  https
+    .request(options, response => {
+      handleResponse(response, callback)
+    })
+    .on('error', err => {
+      callback(err)
+    })
     .end(body)
 }
 
@@ -182,8 +192,8 @@ function processEvent (event, context, callback) {
     if (decodedPayload.messageType === 'CONTROL_MESSAGE') {
       return callback(null, 'Control message handled successfully.')
     }
-    const hasPipeline = ENV.pipeline &&
-      PIPELINE_REGEXP.test(decodedPayload.logGroup)
+    const hasPipeline =
+      ENV.pipeline && PIPELINE_REGEXP.test(decodedPayload.logGroup)
     const transformedPayload = transform(decodedPayload, hasPipeline)
     console.log('Transformed payload:', transformedPayload.replace(/\n/g, ' '))
     post('/_bulk' + queryString(hasPipeline), transformedPayload, callback)
@@ -192,7 +202,7 @@ function processEvent (event, context, callback) {
 
 function decryptAndProcess (event, context, callback) {
   const kms = new AWS.KMS()
-  const enc = {CiphertextBlob: Buffer.from(ENV.encpass, 'base64')}
+  const enc = { CiphertextBlob: Buffer.from(ENV.encpass, 'base64') }
   kms.decrypt(enc, (err, data) => {
     if (err) return callback(err)
     password = data.Plaintext.toString('ascii')

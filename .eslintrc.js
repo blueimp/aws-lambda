@@ -1,7 +1,4 @@
 module.exports = {
   extends: 'standard',
-  plugins: [
-    'standard',
-    'promise'
-  ]
+  plugins: ['standard', 'promise']
 }

@@ -36,7 +36,9 @@ function handleResponse (response, callback) {
   console.log('Status code:', statusCode)
   let responseBody = ''
   response
-    .on('data', chunk => { responseBody += chunk })
+    .on('data', chunk => {
+      responseBody += chunk
+    })
     .on('end', chunk => {
       console.log('Response:', responseBody)
       if (statusCode >= 200 && statusCode < 300) {
@@ -52,20 +54,26 @@ function post (requestURL, data, callback) {
   const options = url.parse(requestURL)
   options.method = 'POST'
   options.headers = {
-    'Authorization': `Bearer ${token}`,
+    Authorization: `Bearer ${token}`,
     'Content-Type': 'application/json',
     'Content-Length': Buffer.byteLength(body)
   }
   console.log('Request options:', JSON.stringify(options))
   console.log('Request body:', body)
-  https.request(options, response => { handleResponse(response, callback) })
-    .on('error', err => { callback(err) })
+  https
+    .request(options, response => {
+      handleResponse(response, callback)
+    })
+    .on('error', err => {
+      callback(err)
+    })
     .end(body)
 }
 
 function buildRequestURL (pipeline) {
-  return 'https://api.buildkite.com' +
-    `/v2/organizations/${ENV.organization}/pipelines/${pipeline}/builds`
+  return `https://api.buildkite.com/v2/organizations/${
+    ENV.organization
+  }/pipelines/${pipeline}/builds`
 }
 
 function buildRequestData (event) {
@@ -83,9 +91,9 @@ function processEvent (event, context, callback) {
   console.log('Event:', JSON.stringify(event))
   const pipeline = event.pipeline || ENV.pipeline
   if (!pipeline) {
-    return callback(new Error(
-      'No pipeline set in event data or as environment variable.'
-    ))
+    return callback(
+      new Error('No pipeline set in event data or as environment variable.')
+    )
   }
   const url = buildRequestURL(pipeline)
   const data = buildRequestData(event)
@@ -94,7 +102,7 @@ function processEvent (event, context, callback) {
 
 function decryptAndProcess (event, context, callback) {
   const kms = new AWS.KMS()
-  const enc = {CiphertextBlob: Buffer.from(ENV.token, 'base64')}
+  const enc = { CiphertextBlob: Buffer.from(ENV.token, 'base64') }
   kms.decrypt(enc, (err, data) => {
     if (err) return callback(err)
     token = data.Plaintext.toString('ascii')

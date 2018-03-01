@@ -24,16 +24,22 @@ const GROUP = process.env.group || 'ssh'
 function getGroupUsers (groupName) {
   return IAM.getGroup({
     GroupName: groupName
-  }).promise().then(data => data.Users.map(user => user.UserName))
+  })
+    .promise()
+    .then(data => data.Users.map(user => user.UserName))
 }
 
 function getSSHPublicKeyIDs (userName) {
   return IAM.listSSHPublicKeys({
     UserName: userName
-  }).promise().then(data => data.SSHPublicKeys.reduce((ids, key) => {
-    if (key.Status === 'Active') return [...ids, key.SSHPublicKeyId]
-    return ids
-  }, []))
+  })
+    .promise()
+    .then(data =>
+      data.SSHPublicKeys.reduce((ids, key) => {
+        if (key.Status === 'Active') return [...ids, key.SSHPublicKeyId]
+        return ids
+      }, [])
+    )
 }
 
 function getSSHPublicKey (userName, keyID) {
@@ -41,7 +47,9 @@ function getSSHPublicKey (userName, keyID) {
     Encoding: 'SSH',
     UserName: userName,
     SSHPublicKeyId: keyID
-  }).promise().then(data => data.SSHPublicKey.SSHPublicKeyBody)
+  })
+    .promise()
+    .then(data => data.SSHPublicKey.SSHPublicKeyBody)
 }
 
 function getSSHPublicKeys (userName) {
@@ -51,23 +59,29 @@ function getSSHPublicKeys (userName) {
 }
 
 function getGroupSSHPublicKeys (group) {
-  return getGroupUsers(group).then(users => {
-    console.log('Users:', JSON.stringify(users))
-    return Promise.all(users.map(userName => getSSHPublicKeys(userName)))
-  }).then(keySets => keySets.reduce((keys, keySet) => {
-    return keys.concat(keySet)
-  }, []))
+  return getGroupUsers(group)
+    .then(users => {
+      console.log('Users:', JSON.stringify(users))
+      return Promise.all(users.map(userName => getSSHPublicKeys(userName)))
+    })
+    .then(keySets =>
+      keySets.reduce((keys, keySet) => {
+        return keys.concat(keySet)
+      }, [])
+    )
 }
 
 exports.handler = (event, context, callback) => {
   console.log('Event:', JSON.stringify(event))
   console.log('Group:', GROUP)
-  getGroupSSHPublicKeys(GROUP).then(keys => {
-    console.log('Keys count:', keys.length)
-    callback(null, {
-      statusCode: 200,
-      headers: {'Content-Type': 'text/plain'},
-      body: keys.join('\n') + '\n'
+  getGroupSSHPublicKeys(GROUP)
+    .then(keys => {
+      console.log('Keys count:', keys.length)
+      callback(null, {
+        statusCode: 200,
+        headers: { 'Content-Type': 'text/plain' },
+        body: keys.join('\n') + '\n'
+      })
     })
-  }).catch(err => callback(err))
+    .catch(err => callback(err))
 }
