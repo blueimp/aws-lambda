@@ -23,7 +23,7 @@
 
 'use strict'
 
-const ENV = process.env
+const ENV = process.ENV
 if (!ENV.groupid) throw new Error('Missing environment variable: groupid')
 
 const PROTOCOL = ENV.protocol || 'tcp'
