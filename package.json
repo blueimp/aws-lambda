@@ -1,5 +1,5 @@
 {
-  "name": "aws-lambda",
+  "name": "@blueimp/aws-lambda",
   "private": true,
   "description": "A collection of functions for AWS Lambda.",
   "keywords": [
