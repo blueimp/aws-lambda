@@ -26,7 +26,6 @@ if (!ENV.webhook) throw new Error('Missing environment variable: webhook')
 let webhook
 
 const AWS = require('aws-sdk')
-const url = require('url')
 const https = require('https')
 
 const STATUS_TYPES = [
@@ -78,16 +77,18 @@ function handleResponse (response, callback) {
 
 function post (requestURL, data, callback) {
   const body = JSON.stringify(data)
-  const options = url.parse(requestURL)
-  options.method = 'POST'
-  options.headers = {
-    'Content-Type': 'application/json',
-    'Content-Length': Buffer.byteLength(body)
+  const options = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Content-Length': Buffer.byteLength(body)
+    }
   }
+  console.log('Request url:', requestURL)
   console.log('Request options:', JSON.stringify(options))
   console.log('Request body:', body)
   https
-    .request(options, response => {
+    .request(requestURL, options, response => {
       handleResponse(response, callback)
     })
     .on('error', err => {
