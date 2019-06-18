@@ -41,7 +41,7 @@ Add the `Topic ARN` as Notification setting to your Elastic Beanstalk
 environment configuration:
 
 ```yml
-OptionSettings:
+option_settings:
   aws:elasticbeanstalk:sns:topics:
     # Send deployment and health notifications to this Amazon SNS topic:
     NotificationTopicARN: arn:aws:sns:eu-west-1:000000000000:eb-deployments
