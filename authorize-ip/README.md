@@ -44,7 +44,7 @@ Add the function code to AWS Lambda with the following configuration options:
 
 Key     | Value
 --------|--------------
-Runtime | Node.js 6.10
+Runtime | Node.js 10.x
 Handler | index.handler
 Role    | aws-lambda-authorize-ip-role
 Memory  | 128 (MB)
