@@ -56,13 +56,13 @@ function isNumeric (n) {
 function buildExtractedSource (extractedFields) {
   const source = {}
   Object.keys(extractedFields).forEach(key => {
-    let value = extractedFields[key]
+    const value = extractedFields[key]
     if (!value) return
     if (isNumeric(value)) {
       source[key] = 1 * value
       return
     }
-    let obj = extractJSON(value)
+    const obj = extractJSON(value)
     if (obj) {
       source['$' + key] = obj
     }
@@ -73,9 +73,9 @@ function buildExtractedSource (extractedFields) {
 
 function addMissingPipelineFields (source) {
   PIPELINE_FIELDS.forEach(field => {
-    let key = field[0]
+    const key = field[0]
     if (source[key]) return
-    let value = field[1]
+    const value = field[1]
     if (isNumeric(value)) {
       source[key] = 1 * value
       return
