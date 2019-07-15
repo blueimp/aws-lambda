@@ -14,6 +14,7 @@
 
 'use strict'
 
+// eslint-disable-next-line node/no-unpublished-require
 const AWS = require('aws-sdk')
 
 AWS.config.credentials = new AWS.TemporaryCredentials({
@@ -21,6 +22,7 @@ AWS.config.credentials = new AWS.TemporaryCredentials({
 })
 
 exports.handler = (event, context, callback) => {
+  // eslint-disable-next-line no-console
   console.log('Event:', JSON.stringify(event))
   const s3 = event.Records[0].s3
   new AWS.S3().putObjectAcl(

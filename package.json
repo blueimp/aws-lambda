@@ -16,15 +16,31 @@
     "url": "git+https://github.com/blueimp/aws-lambda.git"
   },
   "license": "MIT",
+  "devDependencies": {
+    "@types/node": "12",
+    "aws-sdk": "^2.493.0",
+    "eslint": "6",
+    "eslint-config-blueimp": "1",
+    "eslint-config-prettier": "6",
+    "eslint-plugin-jsdoc": "15",
+    "eslint-plugin-node": "9",
+    "eslint-plugin-prettier": "3",
+    "prettier": "1"
+  },
+  "eslintConfig": {
+    "extends": [
+      "blueimp",
+      "plugin:jsdoc/recommended",
+      "plugin:node/recommended",
+      "plugin:prettier/recommended"
+    ]
+  },
+  "prettier": {
+    "proseWrap": "always",
+    "semi": false,
+    "singleQuote": true
+  },
   "scripts": {
     "test": "eslint ."
-  },
-  "devDependencies": {
-    "eslint": "^6.0.1",
-    "eslint-config-standard": "^13.0.0",
-    "eslint-plugin-import": "^2.18.0",
-    "eslint-plugin-node": "^9.1.0",
-    "eslint-plugin-promise": "^4.2.1",
-    "eslint-plugin-standard": "^4.0.0"
   }
 }

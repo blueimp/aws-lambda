@@ -27,6 +27,7 @@ const hsts = env.hsts
 const contentType = env.type || 'text/html'
 
 exports.handler = (event, context, callback) => {
+  // eslint-disable-next-line no-console
   console.log('Event:', JSON.stringify(event))
   const host = event.headers.Host
   // If the subdomain matches, redirect to the parent domain.
@@ -49,6 +50,7 @@ exports.handler = (event, context, callback) => {
     headers: { location, 'content-type': contentType }
   }
   if (hsts) response.headers['strict-transport-security'] = hsts
+  // eslint-disable-next-line no-console
   console.log('Response:', JSON.stringify(response))
   callback(null, response)
 }

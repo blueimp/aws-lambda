@@ -30,10 +30,17 @@ const PROTOCOL = ENV.protocol || 'tcp'
 const PORT = ENV.port || 22
 const DESCRIPTION = ENV.description || 'authorize-ip'
 
+// eslint-disable-next-line node/no-unpublished-require
 const AWS = require('aws-sdk')
 const EC2 = new AWS.EC2()
 
-function authorizeIP (ip) {
+/**
+ * Authprizes the given IP
+ *
+ * @param {string} ip IP address
+ * @returns {Promise} Resolves if the authorization succeeds
+ */
+function authorizeIP(ip) {
   const permission = {
     IpProtocol: PROTOCOL,
     FromPort: PORT,
@@ -61,12 +68,14 @@ function authorizeIP (ip) {
   return new Promise((resolve, reject) => {
     EC2.authorizeSecurityGroupIngress(params)
       .promise()
-      .then(data => {
+      .then(() => {
+        // eslint-disable-next-line no-console
         console.log('IP newly authorized:', ip)
         resolve({ ip })
       })
       .catch(err => {
         if (err.code === 'InvalidPermission.Duplicate') {
+          // eslint-disable-next-line no-console
           console.log('IP already authorized:', ip)
           return resolve({ ip })
         }
@@ -75,7 +84,12 @@ function authorizeIP (ip) {
   })
 }
 
-function cleanupIPs () {
+/**
+ * Cleans up authorized IPs
+ *
+ * @returns {Promise} Resolves if the cleanup operation succeeds
+ */
+function cleanupIPs() {
   const params = {
     GroupIds: [ENV.groupid],
     Filters: [
@@ -99,6 +113,7 @@ function cleanupIPs () {
       const ipPermissions = data.SecurityGroups.length
         ? data.SecurityGroups[0].IpPermissions
         : []
+      // eslint-disable-next-line no-console
       console.log('IP permissions:', JSON.stringify(ipPermissions))
       if (!ipPermissions.length) return null
       const keepIpRanges = (ENV.keepipranges || '').split(',')
@@ -130,6 +145,7 @@ function cleanupIPs () {
 }
 
 exports.handler = (event, context, callback) => {
+  // eslint-disable-next-line no-console
   console.log('Event:', JSON.stringify(event))
   if (event.source === 'aws.events') {
     return cleanupIPs()

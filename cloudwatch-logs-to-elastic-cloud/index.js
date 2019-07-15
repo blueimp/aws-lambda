@@ -35,11 +35,18 @@ const PIPELINE_FIELDS = ENV.pipefields
 
 let password
 
+// eslint-disable-next-line node/no-unpublished-require
 const AWS = require('aws-sdk')
 const zlib = require('zlib')
 const https = require('https')
 
-function extractJSON (message) {
+/**
+ * Extracts JSON from the given message string
+ *
+ * @param {string} message Message string
+ * @returns {object} Message object
+ */
+function extractJSON(message) {
   const jsonStart = message.indexOf('{')
   if (jsonStart < 0) return null
   try {
@@ -49,11 +56,23 @@ function extractJSON (message) {
   }
 }
 
-function isNumeric (n) {
+/**
+ * Tests if the given string is numeric
+ *
+ * @param {string} n Input string
+ * @returns {boolean} Returns true if the given string is numeric
+ */
+function isNumeric(n) {
   return !isNaN(parseFloat(n)) && isFinite(n)
 }
 
-function buildExtractedSource (extractedFields) {
+/**
+ * Builds an extracted source object from the given extracted fields
+ *
+ * @param {object} extractedFields Extracted fields object
+ * @returns {object} Extracted source object
+ */
+function buildExtractedSource(extractedFields) {
   const source = {}
   Object.keys(extractedFields).forEach(key => {
     const value = extractedFields[key]
@@ -71,7 +90,12 @@ function buildExtractedSource (extractedFields) {
   return source
 }
 
-function addMissingPipelineFields (source) {
+/**
+ * Adds missing pipeline fields to the given source object
+ *
+ * @param {object} source Source object
+ */
+function addMissingPipelineFields(source) {
   PIPELINE_FIELDS.forEach(field => {
     const key = field[0]
     if (source[key]) return
@@ -84,7 +108,15 @@ function addMissingPipelineFields (source) {
   })
 }
 
-function buildAction (logEvent, payload, index) {
+/**
+ * Builds an action object from the given arguments
+ *
+ * @param {*} logEvent Log event
+ * @param {*} payload Payload (unused)
+ * @param {string} index Log index
+ * @returns {object} Action object
+ */
+function buildAction(logEvent, payload, index) {
   return {
     index: {
       _index: index,
@@ -94,7 +126,15 @@ function buildAction (logEvent, payload, index) {
   }
 }
 
-function buildSource (logEvent, payload, hasPipeline) {
+/**
+ * Builds a source object from the given arguments
+ *
+ * @param {*} logEvent Log event
+ * @param {*} payload Payload (unused)
+ * @param {boolean} hasPipeline Has pipeline?
+ * @returns {object} Source object
+ */
+function buildSource(logEvent, payload, hasPipeline) {
   const source = logEvent.extractedFields
     ? buildExtractedSource(logEvent.extractedFields)
     : extractJSON(logEvent.message) || {}
@@ -108,7 +148,14 @@ function buildSource (logEvent, payload, hasPipeline) {
   return source
 }
 
-function transform (payload, hasPipeline) {
+/**
+ * Transforms the payload into a request body
+ *
+ * @param {*} payload Payload
+ * @param {boolean} hasPipeline Has pipeline?
+ * @returns {string} Request body
+ */
+function transform(payload, hasPipeline) {
   let bulkRequestBody = ''
   const index = payload.logGroup
     .replace(/\W+|_+/g, '-')
@@ -123,24 +170,34 @@ function transform (payload, hasPipeline) {
   })
   return bulkRequestBody
 }
-
-function handleResponse (response, callback) {
+/**
+ * Handles the HTTP response
+ *
+ * @param {*} response HTTP response
+ * @param {Function} callback Callback function
+ */
+function handleResponse(response, callback) {
   const statusCode = response.statusCode
+  // eslint-disable-next-line no-console
   console.log('Status code:', statusCode)
   let responseBody = ''
   response
     .on('data', chunk => {
       responseBody += chunk
     })
-    .on('end', chunk => {
+    .on('end', () => {
+      // eslint-disable-next-line no-console
       console.log('Response:', responseBody)
       if (statusCode >= 200 && statusCode < 300) {
         const result = JSON.parse(responseBody)
         const items = result.items
         const failed = items.reduce((num, item) => {
+          // eslint-disable-next-line no-param-reassign
           return item.index.status >= 300 ? ++num : num
         }, 0)
+        // eslint-disable-next-line no-console
         console.log('Successful items:', items.length - failed)
+        // eslint-disable-next-line no-console
         console.log('Failed items:', failed)
         if (result.errors || failed) {
           return callback(
@@ -156,11 +213,25 @@ function handleResponse (response, callback) {
     })
 }
 
-function queryString (hasPipeline) {
+/**
+ * Builds the query string
+ *
+ * @param {boolean} hasPipeline Has pipeline?
+ * @returns {string} Query string
+ */
+function queryString(hasPipeline) {
   return hasPipeline ? '?pipeline=' + ENV.pipeline : ''
 }
 
-function post (path, body, callback) {
+/**
+ * Sends an HTTP Post request
+ *
+ * @param {string} path Request path
+ * @param {object} body Post data
+ * @param {Function} callback Callback function
+ */
+function post(path, body, callback) {
+  // eslint-disable-next-line no-console
   console.log('Request URL:', `https://${ENV.hostname}:${ENV.port}${path}`)
   const options = {
     hostname: ENV.hostname,
@@ -183,11 +254,19 @@ function post (path, body, callback) {
     .end(body)
 }
 
-function processEvent (event, context, callback) {
+/**
+ * Processes the triggered event
+ *
+ * @param {*} event Event object
+ * @param {*} context Context object (unused)
+ * @param {Function} callback Callback function
+ */
+function processEvent(event, context, callback) {
   const payload = Buffer.from(event.awslogs.data, 'base64')
   zlib.gunzip(payload, (err, res) => {
     if (err) return callback(err)
     const decodedPayload = JSON.parse(res.toString('utf8'))
+    // eslint-disable-next-line no-console
     console.log('Decoded payload:', JSON.stringify(decodedPayload))
     if (decodedPayload.messageType === 'CONTROL_MESSAGE') {
       return callback(null, 'Control message handled successfully.')
@@ -195,12 +274,20 @@ function processEvent (event, context, callback) {
     const hasPipeline =
       ENV.pipeline && PIPELINE_REGEXP.test(decodedPayload.logGroup)
     const transformedPayload = transform(decodedPayload, hasPipeline)
+    // eslint-disable-next-line no-console
     console.log('Transformed payload:', transformedPayload.replace(/\n/g, ' '))
     post('/_bulk' + queryString(hasPipeline), transformedPayload, callback)
   })
 }
 
-function decryptAndProcess (event, context, callback) {
+/**
+ * Decrypts the secrets and processes the triggered event
+ *
+ * @param {*} event Event object
+ * @param {*} context Context object (unused)
+ * @param {Function} callback Callback function
+ */
+function decryptAndProcess(event, context, callback) {
   const kms = new AWS.KMS()
   const enc = { CiphertextBlob: Buffer.from(ENV.encpass, 'base64') }
   kms.decrypt(enc, (err, data) => {

@@ -25,6 +25,7 @@ if (!ENV.webhook) throw new Error('Missing environment variable: webhook')
 
 let webhook
 
+// eslint-disable-next-line node/no-unpublished-require
 const AWS = require('aws-sdk')
 const https = require('https')
 
@@ -57,15 +58,23 @@ const EXCLUDE_KEYS = [
 ]
 const SHORT_KEYS = ['Application', 'Environment']
 
-function handleResponse (response, callback) {
+/**
+ * Handles the HTTP response
+ *
+ * @param {*} response HTTP response
+ * @param {Function} callback Callback function
+ */
+function handleResponse(response, callback) {
   const statusCode = response.statusCode
+  // eslint-disable-next-line no-console
   console.log('Status code:', statusCode)
   let responseBody = ''
   response
     .on('data', chunk => {
       responseBody += chunk
     })
-    .on('end', chunk => {
+    .on('end', () => {
+      // eslint-disable-next-line no-console
       console.log('Response:', responseBody)
       if (statusCode >= 200 && statusCode < 300) {
         callback(null, 'Request completed successfully.')
@@ -75,7 +84,14 @@ function handleResponse (response, callback) {
     })
 }
 
-function post (requestURL, data, callback) {
+/**
+ * Sends an HTTP Post request
+ *
+ * @param {string} requestURL Request URL
+ * @param {object} data Post data
+ * @param {Function} callback Callback function
+ */
+function post(requestURL, data, callback) {
   const body = JSON.stringify(data)
   const options = {
     method: 'POST',
@@ -84,8 +100,11 @@ function post (requestURL, data, callback) {
       'Content-Length': Buffer.byteLength(body)
     }
   }
+  // eslint-disable-next-line no-console
   console.log('Request url:', requestURL)
+  // eslint-disable-next-line no-console
   console.log('Request options:', JSON.stringify(options))
+  // eslint-disable-next-line no-console
   console.log('Request body:', body)
   https
     .request(requestURL, options, response => {
@@ -97,7 +116,13 @@ function post (requestURL, data, callback) {
     .end(body)
 }
 
-function getStatusColor (data) {
+/**
+ * Returns the status color for the given data object
+ *
+ * @param {object} data Data object
+ * @returns {string} Color
+ */
+function getStatusColor(data) {
   const message = data.Message
   if (!message) return
   let color
@@ -111,7 +136,13 @@ function getStatusColor (data) {
   return color
 }
 
-function generateAttachmentFields (data) {
+/**
+ * Generates attachment fields
+ *
+ * @param {*} data Data object
+ * @returns {Array} Attachment fields
+ */
+function generateAttachmentFields(data) {
   return Object.keys(data).reduce((fields, key) => {
     if (EXCLUDE_KEYS.indexOf(key) === -1) {
       return [
@@ -127,11 +158,19 @@ function generateAttachmentFields (data) {
   }, [])
 }
 
-function buildSlackMessage (data) {
+/**
+ * Builds a Slack message object from the given message data
+ *
+ * @param {object} data Message data
+ * @returns {object} Slack message object
+ */
+function buildSlackMessage(data) {
   return {
     channel: ENV.channel,
     username: ENV.username,
+    // eslint-disable-next-line camelcase
     icon_emoji: ENV.icon_emoji,
+    // eslint-disable-next-line camelcase
     icon_url: ENV.icon_url,
     attachments: [
       {
@@ -144,7 +183,13 @@ function buildSlackMessage (data) {
   }
 }
 
-function parseSNSMessage (message) {
+/**
+ * Parses the given SNS message
+ *
+ * @param {string} message SNS message
+ * @returns {object} Parsed SNS message object
+ */
+function parseSNSMessage(message) {
   const parsedMessage = message.split('\n').reduce((obj, line) => {
     if (line.length) {
       const key = line.split(':', 1)[0]
@@ -157,18 +202,34 @@ function parseSNSMessage (message) {
     }
     return obj
   }, {})
+  // eslint-disable-next-line no-console
   console.log('Parsed SNS Message:', JSON.stringify(parsedMessage))
   return parsedMessage
 }
 
-function processEvent (event, context, callback) {
+/**
+ * Processes the triggered event
+ *
+ * @param {*} event Event object
+ * @param {*} context Context object (unused)
+ * @param {Function} callback Callback function
+ */
+function processEvent(event, context, callback) {
+  // eslint-disable-next-line no-console
   console.log('Event:', JSON.stringify(event))
   const snsMessage = parseSNSMessage(event.Records[0].Sns.Message)
   const postData = buildSlackMessage(snsMessage)
   post(webhook, postData, callback)
 }
 
-function decryptAndProcess (event, context, callback) {
+/**
+ * Decrypts the secrets and processes the triggered event
+ *
+ * @param {*} event Event object
+ * @param {*} context Context object (unused)
+ * @param {Function} callback Callback function
+ */
+function decryptAndProcess(event, context, callback) {
   const kms = new AWS.KMS()
   const enc = { CiphertextBlob: Buffer.from(ENV.webhook, 'base64') }
   kms.decrypt(enc, (err, data) => {
