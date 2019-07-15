@@ -1,4 +1,5 @@
 # ssh-authorized-keys
+
 [AWS Lambda](https://aws.amazon.com/lambda/) function to return authorized keys
 for EC2 SSH access.  
 Meant to be used with [Amazon API Gateway](https://aws.amazon.com/api-gateway/).
@@ -6,11 +7,13 @@ Meant to be used with [Amazon API Gateway](https://aws.amazon.com/api-gateway/).
 ## Setup
 
 ### IAM group creation
+
 Create a new [IAM](https://aws.amazon.com/iam/) group and label it e.g. `ssh`.  
 Attach the managed policy `IAMUserSSHKeys` and add all users that should be
 granted EC2 SSH access.
 
 ### IAM role creation
+
 Create a new [IAM](https://aws.amazon.com/iam/) role with the name
 `aws-lambda-ssh-authorized-keys`. Select the AWS Lambda role type and attach the
 managed policy `AWSLambdaBasicExecutionRole`.  
@@ -28,38 +31,39 @@ replacing `ssh` with the IAM group created in the previous section.
         "iam:listSSHPublicKeys",
         "iam:getSSHPublicKey"
       ],
-      "Resource":[
-        "arn:aws:iam::*:group/ssh",
-        "arn:aws:iam::*:user/*"
-      ]
+      "Resource": ["arn:aws:iam::*:group/ssh", "arn:aws:iam::*:user/*"]
     }
   ]
 }
 ```
 
 ### Function configuration
-Add the function code to AWS Lambda with the following configuration options:  
 
-Key     | Value
---------|--------------
-Runtime | Node.js 10.x
-Handler | index.handler
-Role    | aws-lambda-ssh-authorized-keys
-Memory  | 128 (MB)
-Timeout | 10 sec
+Add the function code to AWS Lambda with the following configuration options:
+
+| Key     | Value                          |
+| ------- | ------------------------------ |
+| Runtime | Node.js 10.x                   |
+| Handler | index.handler                  |
+| Role    | aws-lambda-ssh-authorized-keys |
+| Memory  | 128 (MB)                       |
+| Timeout | 10 sec                         |
 
 ### Environment variables
+
 Set the following optional environment variable for the Lambda function:
 
-Key   | Value
-------|--------------
-group | The IAM group of users authorized for SSH access, defaults to ``"ssh"``.
+| Key   | Value                                                                  |
+| ----- | ---------------------------------------------------------------------- |
+| group | The IAM group of users authorized for SSH access, defaults to `"ssh"`. |
 
 ### Trigger configuration
+
 Add an API Gateway trigger with "Open" security.  
 No API key is necessary, as the returned keys are public by definition.
 
 #### Enable API Gateway Caching
+
 1. Go to the API Gateway console.
 2. Navigate to the Stage Editor for the `prod` stage.
 3. Choose `Settings`.
@@ -68,6 +72,7 @@ No API key is necessary, as the returned keys are public by definition.
 6. Set the `Cache time-to-live (TTL)` to `300` (5 mins).
 
 ### EC2 configuration
+
 Use the following
 [EC2 user data shell script](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/user-data.html#user-data-shell-scripts)
 when launching your instances, replacing `ID` with the API Gateway ID of your
@@ -96,7 +101,9 @@ sshd -t && service sshd reload
 ```
 
 ## License
+
 Released under the [MIT license](https://opensource.org/licenses/MIT).
 
 ## Author
+
 [Sebastian Tschan](https://blueimp.net/)
