@@ -38,6 +38,7 @@ Set the following optional environment variables for the Lambda function:
 
 | Key                                  | Value                                                      |
 | ------------------------------------ | ---------------------------------------------------------- |
+| index                                | The Elasticsearch index name to override logGroup.         |
 | pipeline                             | The Elasticsearch ingest pipeline to use.                  |
 | piperegexp                           | RegExp matched with the log group if the pipeline applies. |
 | pipefields                           | Required fields for the pipeline to add if missing, e.g.:  |
