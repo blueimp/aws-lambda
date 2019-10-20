@@ -157,7 +157,7 @@ function buildSource(logEvent, payload, hasPipeline) {
  */
 function transform(payload, hasPipeline) {
   let bulkRequestBody = ''
-  const index = ENV.index ? ENV.index : payload.logGroup
+  const index = (ENV.index ? ENV.index : payload.logGroup)
     .replace(/\W+|_+/g, '-')
     .replace(/^-/, '')
     .toLowerCase()
