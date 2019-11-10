@@ -42,7 +42,7 @@ Create an [Amazon SNS](https://aws.amazon.com/sns/) topic and add it as SNS
 trigger for the Lambda function.
 
 Add the `Topic ARN` as Notification setting to your Elastic Beanstalk
-environment configuration:
+[Environment Manifest (env.yaml)](https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/environment-cfg-manifest.html):
 
 ```yml
 OptionSettings:
